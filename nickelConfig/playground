@@ -1,0 +1,5 @@
+menu_item :main    :Sketch Pad         :nickel_extras      :sketch_pad
+menu_item :main	   :Screeshot	       :nickel_setting	   :toggle	:screenshots
+menu_item :main    :Show an Error      :dbg_error          :This is an error message!
+menu_item :main    :Kernel Version     :cmd_output         :500:uname -a
+experimental	:menu_main_15505_label	:Hacks

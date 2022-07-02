@@ -1,0 +1,13 @@
+menu_item :browser :Dark mode	:nickel_setting     :toggle :dark_mode
+menu_item :reader  :Dark mode	:nickel_setting     :toggle :dark_mode
+menu_item :main    :Dark mode	:nickel_setting     :toggle :dark_mode
+
+# nickel_setting     - <action>:<setting>
+#                                        action is one of:
+#                                          toggle  - toggles between true/false
+#                                          enable  - sets to true
+#                                          disable - sets to false
+#                                        setting is one of:
+#                                          invert          - FeatureSettings.InvertScreen
+#                                          lockscreen      - PowerSettings.UnlockEnabled (4.12.12111+)
+#                                          screenshots 
