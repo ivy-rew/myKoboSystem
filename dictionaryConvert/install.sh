@@ -9,6 +9,15 @@ deps(){
     if ! [ -d "PocketBookDic" ]; then
       git clone git@github.com:ivy-rew/PocketBookDic.git
     fi
+    
+    # perl deps: 
+    # -------------
+    # alternative: 
+    # https://stackoverflow.com/questions/19302025/cant-locate-xml-libxml-pm
+    # perl -MCPAN -e shell
+    # install XML::Tidy
+    sudo cpan XML::Tidy
+
     sudo apt install -y dictzip stardict-tools
     pip3 install penelope
 }
@@ -18,34 +27,53 @@ fBase=`basename "${mobi}"`
 base=`echo "${fBase%.*}"`
 
 unpacked="${DIR}/input/${base}/mobi7"
-unlocal="${DIR}/PocketBookDic/input/${base}/mobi7"
+
+unpack(){
+  # 1. Unpack *.mobi Dictionary; bought 4 Amazon Kindle
+  if ! [ -d "${unpacked}" ]; then
+    echo "unpacking mobie file ${mobi}"
+    python3 ${DIR}/KindleUnpack/lib/kindleunpack.py "${mobi}" "input/${base}"
+    mv -v "${unpacked}/book.html" "${unpacked}/${base}.html"
+  fi
+}
+
+toXML(){
+  cd "PocketBookDic"
+  perl "pocketbookdic.pl" "../${mobi}"
+  cd ".."
+}
+
+toStartdict(){
+  echo "packing to 'startdict.ifo' format"
+  recBase="${unpacked}/${base}_reconstructed"
+  xml="${recBase}.xml"
+  ifo="${recBase}.ifo"
+  echo "==> if you face 'CDATA invalid char value' parser errors, remove these manually!!"
+  echo "==> use VsCode search/replace: on ${xml}"
+  /usr/lib/stardict-tools/stardict-text2bin "${xml}" "${ifo}"
+
+  # zip [.ifo|.idx|.dict.dz] into a single zip file as input for 'penelop'
+  cd "${unpacked}"
+  ls -la
+  zip "${base}_stardict.zip" "`ls *.ifo`" "`ls *.idx`" "`ls *.dict.dz`"
+  cd ${DIR}
+}
+
+toKobo(){
+  # penelope: stardict > kobo
+  # > omit file extensions in input and output! (.zip is auto added)
+  read -p "Enter from language (e.g. 'en'): " inLang
+  read -p "Enter target language (e.g. 'de'): " outLang
+  penelope -i "${unpacked}/${base}_stardict" -j stardict -f ${inLang} -t ${outLang} -p kobo -o dicthtml-${inLang}-${outLang}
+}
 
 convert(){
-    # 1. Unpack *.mobi Dictionary; bought 4 Amazon Kindle
-    if ! [ -d "${unpacked}" ]; then
-      echo "unpacking mobie file ${mobi}"
-      python3 ${DIR}/KindleUnpack/lib/kindleunpack.py "${mobi}" "input/${base}"
-      mv -v "${unpacked}/book.html" "${unpacked}/${base}.html"
-    fi
-
-    cd "PocketBookDic"
-    perl "pocketbookdic.pl" "../${mobi}"
-
-#    # manually run stardict:
-#    xml="/mnt/data/dev/_kobo/PocketBookDic/fr/pons/ponsFR/mobi7/ponsFR_reconstructed.xml"
-#    ifo="/mnt/data/dev/_kobo/PocketBookDic/fr/pons/ponsFR/mobi7/ponsFR_reconstructed.ifo"
-#    /usr/lib/stardict-tools/stardict-text2bin "${xml}" "${ifo}"
-#
-#
-#    # manually remove special non utf-8 chars from 'xml'
-#
-#    # zip [.ifo|.idx|.dict.dz] into a single zip file as input for 'penelop'
-#    zip ponsFRstardict.zip *.ifo *.idx *.dict.dz
-#
-#    # penelope: stardict > kobo
-#    # > omit file extensions in input and output! (.zip is auto added)
-#    penelope -i ../PocketBookDic/fr/pons/ponsFR/mobi7/ponsFRstardict -j stardict -f fr -t de -p kobo -o dicthtml-fr-de
+  deps
+  unpack
+  toXML
+  # manually remove special non utf-8 chars from 'xml'
+  toStartdict
+  toKobo
 }
 
 convert
-
