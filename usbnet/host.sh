@@ -24,6 +24,9 @@ usbIP(){
 
 # https://www.yingtongli.me/blog/2018/07/30/kobo-telnet-usb.html
 
+# copy '~/.vnc/xstartup' from 'debianDevSystem'
+# vnc initally seems dead; wait 60 secs till the desktop is ready
+# analyze the pid.log of tightvnc to solve missing window borders
 # tightvncserver :7 -geometry 1680x1264 -depth 24 -dpi 96
 
 # einkvnc
