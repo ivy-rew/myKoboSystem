@@ -1,0 +1,10 @@
+#!/bin/sh
+insmod /drivers/mx6sll-ntx/usb/gadget/configfs.ko
+insmod /drivers/mx6sll-ntx/usb/gadget/libcomposite.ko
+insmod /drivers/mx6sll-ntx/usb/gadget/u_ether.ko
+insmod /drivers/mx6sll-ntx/usb/gadget/usb_f_ecm.ko
+insmod /drivers/mx6sll-ntx/usb/gadget/usb_f_eem.ko
+insmod /drivers/mx6sll-ntx/usb/gadget/usb_f_ecm_subset.ko
+insmod /drivers/mx6sll-ntx/usb/gadget/usb_f_rndis.ko
+insmod /drivers/mx6sll-ntx/usb/gadget/g_ether.ko
+ifconfig usb0 192.168.2.2
